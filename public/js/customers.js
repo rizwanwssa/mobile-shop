@@ -35,6 +35,20 @@
       row.querySelector('.i_qty').value = item.qty || 1;
       row.querySelector('.i_price').value = item.unitPrice || item.unit_price || 0;
     }
+    // Scan button copies a scanned barcode/IMEI into this row's description.
+    const scanBtn = document.createElement('button');
+    scanBtn.type = 'button';
+    scanBtn.className = 'btn btn--sm i_scan';
+    scanBtn.textContent = '📷 Scan';
+    scanBtn.addEventListener('click', function () {
+      if (window.barcode && window.barcode.startCameraScan) {
+        window.barcode.startCameraScan(function (code) {
+          row.querySelector('.i_desc').value = code;
+          recalc();
+        });
+      }
+    });
+    row.appendChild(scanBtn);
     row.querySelector('.i_rm').addEventListener('click', function () { row.remove(); recalc(); });
     row.querySelectorAll('input').forEach(function (inp) { inp.addEventListener('input', recalc); });
     itemsEl.appendChild(row);
@@ -63,6 +77,39 @@
       }
     });
     return out;
+  }
+
+  // After a successful sale, show Print / PDF / WhatsApp actions.
+  function showSaleActions(saleId, invoiceNo) {
+    const card = saleBody.closest('.card');
+    if (!card) return;
+    let box = document.getElementById('saleActions');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'saleActions';
+      box.className = 'sale-actions card';
+      card.appendChild(box);
+    }
+    box.innerHTML =
+      '<h3 class="card__title">Sale #' + ui.esc(invoiceNo || saleId) + ' recorded ✓</h3>' +
+      '<div class="btn-row">' +
+        '<button class="btn btn--primary" id="btnPrintBill">🧾 Print Bill (Thermal)</button>' +
+        '<button class="btn" id="btnPdf">⬇ Download PDF</button>' +
+        '<button class="btn" id="btnWa">💬 Send WhatsApp</button>' +
+      '</div>';
+    document.getElementById('btnPrintBill').addEventListener('click', function () {
+      if (window.printBill) window.printBill(saleId);
+    });
+    document.getElementById('btnPdf').addEventListener('click', function () {
+      if (window.downloadInvoicePDF) window.downloadInvoicePDF(saleId);
+    });
+    document.getElementById('btnWa').addEventListener('click', async function () {
+      try {
+        const r = await api.get('/api/invoices/' + saleId + '/whatsapp', { allow404: true });
+        if (r && r.url) window.open(r.url, '_blank');
+        else ui.toast('No customer phone on this sale', 'error');
+      } catch (e) { ui.showError(e); }
+    });
   }
 
   async function loadCustomers() {
@@ -162,7 +209,10 @@
       recalc();
       loadSales();
       const saleId = res && res.saleId;
-      if (saleId) window.open('/api/invoices/' + saleId + '/pdf', '_blank');
+      if (saleId) {
+        // Show Print + WhatsApp + PDF actions instead of auto-opening a tab.
+        showSaleActions(saleId, res.invoiceNo);
+      }
     } catch (err) { ui.showError(err); }
   });
 

@@ -13,7 +13,8 @@ window.nav = (function () {
     { href: '/repair.html',     label: 'Repairs',        icon: '🔧' },
     { href: '/installments.html', label: 'Installments', icon: '📒' },
     { href: '/expenses.html',   label: 'Expenses',       icon: '💸' },
-    { href: '/users.html',      label: 'Users',          icon: '👤' }
+    { href: '/users.html',      label: 'Users',          icon: '👤' },
+    { href: '/report.html',     label: 'Daily Report',   icon: '📊' }
   ];
 
   function currentPath() {

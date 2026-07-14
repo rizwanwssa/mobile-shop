@@ -177,6 +177,50 @@ async function main() {
     adb.prepare('DELETE FROM admin_users WHERE id=?').run(staffId);
   } catch (e) { /* best-effort cleanup */ }
 
+  // ---------- NEW FEATURES (Phase 2) ----------
+  // Print Bill (Feature 1): thermal receipt HTML
+  const testSale = await call('POST', '/api/sales', { token, body: { customerId: null, items: [{ description: 'Test Phone', qty: 1, unitPrice: 1234.56 }], discount: 0 } });
+  ok('phase2: test sale created', testSale.status === 201 && testSale.body.saleId, testSale.body);
+  const p2SaleId = testSale.body.saleId;
+  const receipt = await call('GET', '/api/sales/' + p2SaleId + '/receipt-html', { token });
+  ok('phase2: receipt-html 200 + text/html', receipt.status === 200 && /text\/html/.test(receipt.contentType || ''), receipt.status);
+  ok('phase2: receipt shows GRAND TOTAL', receipt.status === 200 && /GRAND TOTAL/.test(receipt.raw) && /1234\.56/.test(receipt.raw), receipt.raw ? receipt.raw.slice(0, 200) : null);
+  const receipt58 = await call('GET', '/api/sales/' + p2SaleId + '/receipt-html?w=58', { token });
+  ok('phase2: receipt 58mm width applied', receipt58.status === 200 && /58mm/.test(receipt58.raw), receipt58.status);
+  const p2Pdf = await call('GET', '/api/invoices/' + p2SaleId + '/pdf', { token });
+  ok('phase2: invoice PDF 200 + application/pdf', p2Pdf.status === 200 && /application\/pdf/.test(p2Pdf.contentType || ''), p2Pdf.status);
+
+  // WhatsApp share (Feature 2)
+  const p2Wa = await call('GET', '/api/invoices/' + p2SaleId + '/whatsapp', { token });
+  ok('phase2: whatsapp returns wa.me url or null', p2Wa.status === 200 && (typeof p2Wa.body.url === 'string' || p2Wa.body.url === null), p2Wa.body);
+
+  // Daily Profit Report (Feature 3)
+  const daily = await call('GET', '/api/reports/daily', { token });
+  ok('phase2: daily report shape', daily.status === 200 && 'todaySales' in daily.body && 'todayExpenses' in daily.body && 'dayNetProfit' in daily.body && 'salesCount' in daily.body, daily.body);
+  const dailyBad = await call('GET', '/api/reports/daily?date=notanumber', { token });
+  // bad date -> either 400 or graceful; just ensure no 500 crash
+  ok('phase2: daily bad-date handled (no 500)', dailyBad.status !== 500, dailyBad.body);
+
+  // New vs Used profit split (Feature 4) + used mark-sold
+  const splitBefore = await call('GET', '/api/reports/profit-split', { token });
+  ok('phase2: profit-split shape', splitBefore.status === 200 && 'profitFromNew' in splitBefore.body && 'profitFromUsed' in splitBefore.body && 'totalProfit' in splitBefore.body, splitBefore.body);
+  const usedBuy = await call('POST', '/api/used', { token, body: { sellerName: 'Used Seller', purchasePrice: 200, model: 'Used Phone X' } });
+  ok('phase2: used purchase created', usedBuy.status === 201 && usedBuy.body.id, usedBuy.body);
+  const p2UsedId = usedBuy.body.id;
+  const markSold = await call('POST', '/api/used/' + p2UsedId + '/mark-sold', { token, body: { soldPrice: 300 } });
+  ok('phase2: used mark-sold sets soldPrice', markSold.status === 200 && markSold.body.soldPrice === 300, markSold.body);
+  const splitAfter = await call('GET', '/api/reports/profit-split', { token });
+  ok('phase2: profitFromUsed increased after mark-sold', splitAfter.body.profitFromUsed > splitBefore.body.profitFromUsed, { before: splitBefore.body.profitFromUsed, after: splitAfter.body.profitFromUsed });
+
+  // Barcode-related backend: none (frontend only) — covered by syntax check in CI.
+
+  // cleanup test sale + used rows (best-effort, keep DB tidy)
+  try {
+    adb.prepare('DELETE FROM sale_items WHERE sale_id=?').run(p2SaleId);
+    adb.prepare('DELETE FROM sales WHERE id=?').run(p2SaleId);
+    adb.prepare('DELETE FROM used_purchases WHERE id=?').run(p2UsedId);
+  } catch (e) { /* ignore */ }
+
   console.log(`\n=== RESULT: ${pass} passed, ${fail} failed ===`);
   if (fail > 0) { console.log('FAILED:', fails.join(', ')); process.exit(1); }
   console.log('ALL CHECKS PASSED ✓');

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Reports · Mobile Shop System</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .report-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .report-grid { grid-template-columns: 1fr 1fr; } }
+
+    .stat-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
+    .stat {
+      flex: 1 1 150px; background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .stat__label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: .04em; }
+    .stat__value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+    .stat__value--profit { color: #16a34a; }
+    .stat__value--loss { color: #dc2626; }
+
+    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+    .split-card { border-radius: 12px; padding: 18px; text-align: center; }
+    .split-card--new { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .split-card--used { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .split-card__label { font-size: 13px; color: #475569; }
+    .split-card__value { font-size: 30px; font-weight: 800; margin-top: 6px; }
+    .split-total {
+      margin-top: 14px; text-align: center; font-size: 15px; color: #334155;
+      background: #f1f5f9; border-radius: 10px; padding: 12px;
+    }
+    .split-total strong { font-size: 22px; display: block; color: #0f172a; }
+
+    .field-inline { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+    .field-inline .field { flex: 1 1 200px; }
+
+    @media print {
+      .nav, .no-print { display: none !important; }
+      body { background: #fff; }
+      .app { display: block; }
+      .page { padding: 0; }
+      .card { box-shadow: none; border: 1px solid #cbd5e1; break-inside: avoid; }
+      .report-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="nav" data-nav></header>
+    <main class="page">
+      <div class="page__header">
+        <div class="page__title">Reports</div>
+      </div>
+
+      <div id="denied" class="denied hidden">
+        🔒 Owner access required. Reports are available to the shop owner only.
+      </div>
+
+      <div id="content">
+        <div class="report-grid">
+          <!-- Daily Report -->
+          <section class="card" id="dailyCard">
+            <h3 class="card__title">Daily Report</h3>
+            <div class="field-inline">
+              <div class="field">
+                <label>Date</label>
+                <input type="date" id="dailyDate">
+              </div>
+              <button class="btn btn--primary no-print" id="printBtn">🖨 Print</button>
+            </div>
+            <div class="stat-row">
+              <div class="stat">
+                <div class="stat__label">Sales</div>
+                <div class="stat__value" id="dSales">—</div>
+              </div>
+              <div class="stat">
+                <div class="stat__label">Expenses</div>
+                <div class="stat__value" id="dExpenses">—</div>
+              </div>
+              <div class="stat">
+                <div class="stat__label">Net Profit</div>
+                <div class="stat__value" id="dProfit">—</div>
+              </div>
+            </div>
+            <div class="stat__label" style="margin-top:10px" id="dCount"></div>
+          </section>
+
+          <!-- New vs Used split -->
+          <section class="card" id="splitCard">
+            <h3 class="card__title">Profit: New vs Used</h3>
+            <div class="split-grid">
+              <div class="split-card split-card--new">
+                <div class="split-card__label">New (inventory)</div>
+                <div class="split-card__value" id="pNew">—</div>
+              </div>
+              <div class="split-card split-card--used">
+                <div class="split-card__label">Used (resold)</div>
+                <div class="split-card__value" id="pUsed">—</div>
+              </div>
+            </div>
+            <div class="split-total">
+              Total Profit
+              <strong id="pTotal">—</strong>
+            </div>
+            <div class="stat__label" style="margin-top:10px" id="pPeriod"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/report.js"></script>
+</body>
+</html>

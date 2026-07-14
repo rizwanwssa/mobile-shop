@@ -112,4 +112,16 @@
   });
 
   load();
+
+  // Barcode: USB scanner (keyboard wedge) + camera button for IMEI 1.
+  const imei1El = document.getElementById('f_imei1');
+  const scanBtn = document.getElementById('scan_imei1');
+  if (imei1El && window.barcode) {
+    window.barcode.attachUsbScanner(imei1El, function (code) { imei1El.value = code; });
+    if (scanBtn) {
+      scanBtn.addEventListener('click', function () {
+        window.barcode.startCameraScan(function (code) { imei1El.value = code; });
+      });
+    }
+  }
 })();
