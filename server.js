@@ -21,7 +21,7 @@ app.post('/api/auth/login', authCtrl.login);
 // ---- Module routers (mounted by assembler) ----
 const routers = [
   'inventory', 'customers', 'sales', 'invoices',
-  'usedbuying', 'repair', 'installments', 'expenses', 'dashboard', 'sample'
+  'usedbuying', 'repair', 'installments', 'expenses', 'dashboard', 'sample', 'config'
 ];
 for (const name of routers) {
   try {
