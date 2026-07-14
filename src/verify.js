@@ -190,6 +190,13 @@ async function main() {
   const p2Pdf = await call('GET', '/api/invoices/' + p2SaleId + '/pdf', { token });
   ok('phase2: invoice PDF 200 + application/pdf', p2Pdf.status === 200 && /application\/pdf/.test(p2Pdf.contentType || ''), p2Pdf.status);
 
+  // Regression guard: print.js now fetches WITH the auth token (a bare window.open
+  // would 401). Prove the with-token path returns 200 and the no-token path 401s.
+  const pRecTok = await call('GET', '/api/sales/' + p2SaleId + '/receipt-html', { token });
+  ok('phase2: receipt-html 200 with token (print button)', pRecTok.status === 200 && /text\/html/.test(pRecTok.contentType || ''), pRecTok.status);
+  const noAuth = await call('GET', '/api/sales/' + p2SaleId + '/receipt-html', {});
+  ok('phase2: receipt-html 401 without token (auth kept)', noAuth.status === 401, noAuth.status);
+
   // WhatsApp share (Feature 2)
   const p2Wa = await call('GET', '/api/invoices/' + p2SaleId + '/whatsapp', { token });
   ok('phase2: whatsapp returns wa.me url or null', p2Wa.status === 200 && (typeof p2Wa.body.url === 'string' || p2Wa.body.url === null), p2Wa.body);
