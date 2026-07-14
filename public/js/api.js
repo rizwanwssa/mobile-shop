@@ -54,7 +54,7 @@ window.api = (function () {
         autoLogin = true;
         if (!getToken()) {
           try {
-            const r = await fetch('/api/auth/auto-login', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const r = await fetch('/api/auto-login', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
             if (r.ok) {
               const j = await r.json();
               if (j && j.token) { setToken(j.token); setAdmin(j.admin || null); }
