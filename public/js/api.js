@@ -30,8 +30,12 @@ window.api = (function () {
   }
   function redirectToLogin() {
     if (isLoginPage()) return;
-    const here = encodeURIComponent(window.location.pathname + window.location.search);
-    window.location.replace(LOGIN_URL + '?next=' + here);
+    // Auto-login may still be in flight — wait for it before bouncing to login.
+    Promise.resolve(publicApi && publicApi.ready).then(function () {
+      if (getToken()) { window.location.reload(); return; } // logged in now: re-run page guard
+      const here = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.replace(LOGIN_URL + '?next=' + here);
+    });
   }
   function isOwner() {
     const a = getAdmin();
@@ -122,11 +126,14 @@ window.api = (function () {
     return result;
   }
 
-  return {
+  const publicApi = {
     get, post, put, del, login, logout, bootstrap,
     get token() { return getToken(); },
     get admin() { return getAdmin(); },
     isOwner,
     redirectToLogin
   };
+  // Kick off auto-login immediately; pages can `await api.ready` before guarding.
+  publicApi.ready = bootstrap();
+  return publicApi;
 })();
