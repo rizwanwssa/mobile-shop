@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Expenses · Mobile Shop System</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="nav" data-nav></header>
+    <main class="page">
+      <div class="page__header">
+        <div class="page__title">Expenses</div>
+        <button class="btn btn--primary" id="addBtn">+ Add Expense</button>
+      </div>
+
+      <div id="denied" class="denied hidden">
+        🔒 Owner access required. Expenses are managed by the shop owner only.
+      </div>
+
+      <div id="content">
+        <div class="card">
+          <h3 class="card__title">Add Expense</h3>
+          <form id="expForm">
+            <div class="form-grid">
+              <div class="field"><label>Category</label>
+                <select id="e_cat">
+                  <option value="rent">Rent</option>
+                  <option value="electricity">Electricity</option>
+                  <option value="salary">Salary</option>
+                  <option value="tea">Tea</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="field"><label>Amount</label><input id="e_amount" type="number" step="0.01" min="0" required></div>
+              <div class="field col-span-2"><label>Description</label><input id="e_desc"></div>
+            </div>
+            <div class="btn-row mt">
+              <button class="btn btn--primary" type="submit">Save</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 class="card__title">Expense Log</h3>
+          <div class="table-wrap">
+            <table class="data" id="expTable">
+              <thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr></thead>
+              <tbody id="expBody"><tr><td colspan="4">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/expenses.js"></script>
+</body>
+</html>

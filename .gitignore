@@ -1,0 +1,14 @@
+node_modules/
+npm-debug.log*
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/sms.log
+uploads/*
+!uploads/.gitkeep
+tunnel_url.txt
+tunnel_watchdog.js
+_*.js
+_*.sh
+*.log
+.DS_Store

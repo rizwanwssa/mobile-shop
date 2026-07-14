@@ -1,0 +1,25 @@
+# Render deployment config for the Mobile Shop Management System.
+# Free Web Service. No credit card. SQLite on ephemeral disk (resets on deploy —
+# use the in-app "Load sample data" button to repopulate).
+services:
+  - type: web
+    name: mobile-shop-system
+    runtime: node
+    plan: free
+    region: frankfurt # closest Render region to UAE/Pakistan for lower latency
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PORT
+        value: 10000 # Render injects its own PORT; this is a fallback
+      - key: OWNER_PASS
+        sync: false # set in Render dashboard (encrypt)
+      - key: JWT_SECRET
+        sync: false # set in Render dashboard (encrypt)
+      - key: SHOP_NAME
+        value: "Mobile Shop"
+      - key: DB_PATH
+        value: "./data/shop.db"

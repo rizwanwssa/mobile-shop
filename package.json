@@ -1,0 +1,22 @@
+{
+  "name": "mobile-shop-system",
+  "version": "1.0.0",
+  "description": "Web-based Mobile Shop Management System (POS) - 8 modules per spec",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node src/seed.js",
+    "backup": "node src/backup.js run",
+    "verify": "node src/verify.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "pdfkit": "^0.15.0"
+  },
+  "license": "MIT"
+}

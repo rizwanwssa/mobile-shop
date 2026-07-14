@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Customers &amp; Sales · Mobile Shop System</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="nav" data-nav></header>
+    <main class="page">
+      <div class="page__header">
+        <div class="page__title">Customers &amp; Sales</div>
+        <button class="btn btn--primary" id="addCustBtn">+ Add Customer</button>
+      </div>
+
+      <!-- Customers -->
+      <div class="card">
+        <h3 class="card__title">Customers</h3>
+        <div class="table-wrap">
+          <table class="data" id="custTable">
+            <thead><tr><th>Name</th><th>Phone</th><th>CNIC</th><th></th></tr></thead>
+            <tbody id="custBody"><tr><td colspan="4">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- New customer -->
+      <div class="card hidden" id="custCard">
+        <h3 class="card__title">Add Customer</h3>
+        <form id="custForm">
+          <div class="form-grid">
+            <div class="field"><label>Name</label><input id="c_name" required></div>
+            <div class="field"><label>Phone</label><input id="c_phone"></div>
+            <div class="field"><label>CNIC</label><input id="c_cnic"></div>
+            <div class="field"><label>ID Card Front (image)</label><input id="c_front" type="file" accept="image/*"></div>
+            <div class="field"><label>ID Card Back (image)</label><input id="c_back" type="file" accept="image/*"></div>
+          </div>
+          <div class="btn-row mt">
+            <button class="btn btn--primary" type="submit">Save Customer</button>
+            <button class="btn btn--ghost" type="button" id="custCancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sales entry -->
+      <div class="card">
+        <h3 class="card__title">New Sale</h3>
+        <form id="saleForm">
+          <div class="form-grid">
+            <div class="field"><label>Customer</label>
+              <select id="s_customer"><option value="">— walk-in —</option></select>
+            </div>
+            <div class="field"><label>Payment Method</label>
+              <select id="s_pay">
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="transfer">Transfer</option>
+              </select>
+            </div>
+          </div>
+
+          <h4 class="mt">Line Items</h4>
+          <div id="items"><!-- item rows --></div>
+          <button class="btn btn--ghost btn--sm mt" type="button" id="addItem">+ Add Item</button>
+
+          <div class="form-grid mt">
+            <div class="field"><label>Discount</label><input id="s_discount" type="number" step="0.01" min="0" value="0"></div>
+            <div class="field"><label>Notes</label><input id="s_notes"></div>
+          </div>
+          <div class="row spread mt">
+            <strong>Total: <span id="s_total">0.00</span></strong>
+            <button class="btn btn--primary" type="submit">Record Sale</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Recent sales -->
+      <div class="card">
+        <h3 class="card__title">Recent Sales</h3>
+        <div class="table-wrap">
+          <table class="data" id="saleTable">
+            <thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th><th></th></tr></thead>
+            <tbody id="saleBody"><tr><td colspan="5">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/customers.js"></script>
+</body>
+</html>

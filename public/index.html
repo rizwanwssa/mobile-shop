@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>Dashboard · Mobile Shop System</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="nav" data-nav></header>
+    <main class="page">
+      <div class="page__header">
+        <div class="page__title">Dashboard</div>
+        <div class="row" id="rangeBar">
+          <select id="range" class="field" style="width:auto;">
+            <option value="all">All time</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input type="date" id="from" class="hidden" style="width:auto;">
+          <input type="date" id="to" class="hidden" style="width:auto;">
+          <button class="btn btn--ghost btn--sm" id="refresh">↻ Refresh</button>
+          <button class="btn btn--sm" id="seedBtn">＋ Load Sample Data</button>
+        </div>
+      </div>
+
+      <div id="denied" class="denied hidden">
+        🔒 Owner access required. This dashboard is available to the shop owner only.
+      </div>
+
+      <div id="content">
+        <div class="stat-grid" id="stats">
+          <div class="stat stat--invest"><div class="stat__label">Total Investment</div><div class="stat__value" id="sInvest">—</div></div>
+          <div class="stat"><div class="stat__label">Total Sales</div><div class="stat__value" id="sSales">—</div></div>
+          <div class="stat stat--profit"><div class="stat__label">Net Profit</div><div class="stat__value" id="sProfit">—</div></div>
+          <div class="stat"><div class="stat__label">Units in Stock</div><div class="stat__value" id="sStock">—</div></div>
+        </div>
+
+        <div class="card">
+          <h3 class="card__title">Low-Stock Alert</h3>
+          <div id="lowStock" style="min-height:40px;">Loading…</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
