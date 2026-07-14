@@ -11,6 +11,7 @@ window.api = (function () {
   const LOGIN_URL = '/login.html';
 
   let autoLogin = false; // learned from /api/config
+  let readyPromise = null; // resolves when bootstrap (config + auto-login) completes
 
   function getToken() {
     try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; }
@@ -31,7 +32,7 @@ window.api = (function () {
   function redirectToLogin() {
     if (isLoginPage()) return;
     // Auto-login may still be in flight — wait for it before bouncing to login.
-    Promise.resolve(publicApi && publicApi.ready).then(function () {
+    Promise.resolve(readyPromise).then(function () {
       if (getToken()) { window.location.reload(); return; } // logged in now: re-run page guard
       const here = encodeURIComponent(window.location.pathname + window.location.search);
       window.location.replace(LOGIN_URL + '?next=' + here);
@@ -66,8 +67,10 @@ window.api = (function () {
   }
 
   async function request(method, path, body) {
-    if (!getToken() && autoLogin && !path.startsWith('/api/auth/') && !path.startsWith('/api/config')) {
-      await bootstrap();
+    // Always let auto-login finish first (config + owner sign-in) so the very
+    // first data call already carries a token — prevents the login-flash loop.
+    if (readyPromise && !path.startsWith('/api/config') && !path.startsWith('/api/auth/')) {
+      try { await readyPromise; } catch (e) { /* ignore */ }
     }
     const headers = { 'Accept': 'application/json' };
     const token = getToken();
@@ -134,6 +137,7 @@ window.api = (function () {
     redirectToLogin
   };
   // Kick off auto-login immediately; pages can `await api.ready` before guarding.
-  publicApi.ready = bootstrap();
+  readyPromise = bootstrap();
+  publicApi.ready = readyPromise;
   return publicApi;
 })();
