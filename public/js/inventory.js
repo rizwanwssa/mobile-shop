@@ -124,4 +124,16 @@
       });
     }
   }
+
+  // Always-visible header Scan button: opens the Add Unit form with IMEI pre-filled.
+  const scanHeaderBtn = document.getElementById('scanHeaderBtn');
+  if (scanHeaderBtn && window.barcode) {
+    scanHeaderBtn.addEventListener('click', function () {
+      window.barcode.startCameraScan(function (code) {
+        if (typeof openForm === 'function') openForm(null);
+        const el = document.getElementById('f_imei1');
+        if (el) el.value = code;
+      });
+    });
+  }
 })();
