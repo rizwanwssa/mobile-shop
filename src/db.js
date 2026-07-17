@@ -190,4 +190,22 @@ CREATE TABLE IF NOT EXISTS expenses (
 
 db.exec(SCHEMA);
 
+// ---- Idempotent migrations (add columns to existing DBs without data loss) ----
+// Each statement is wrapped in a guard so re-running is always safe.
+(function runMigrations() {
+  function addColumn(table, column, definition) {
+    const exists = db.prepare(`PRAGMA table_info(${table})`).all().some(c => c.name === column);
+    if (!exists) {
+      db.prepare(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`).run();
+    }
+  }
+  // Used-buying -> resell linkage (Module 4 resale).
+  addColumn('used_purchases', 'sale_price', "REAL NOT NULL DEFAULT 0");
+  addColumn('used_purchases', 'status', "TEXT NOT NULL DEFAULT 'in_stock'"); // in_stock | sold
+  addColumn('used_purchases', 'inventory_unit_id', "INTEGER");
+  addColumn('used_purchases', 'sold_at', "INTEGER");
+  addColumn('used_purchases', 'sold_sale_id', "INTEGER");
+  addColumn('used_purchases', 'source', "TEXT NOT NULL DEFAULT 'purchase'"); // purchase | transfer
+})();
+
 module.exports = db;

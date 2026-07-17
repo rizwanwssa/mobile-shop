@@ -70,14 +70,37 @@
       const data = await api.get('/api/used', { allow404: true });
       const list = Array.isArray(data) ? data : (data && data.items ? data.items : []);
       ui.renderList(body, list, function (u) {
+        const isSold = u.status === 'sold';
+        const badge = isSold
+          ? '<span class="badge badge--sold">Sold</span>'
+          : '<span class="badge badge--in_stock">In Stock</span>';
+        const actions = isSold
+          ? '<a class="btn btn--sm btn--ghost" target="_blank" href="/api/invoices/' + (u.sold_sale_id || '') + '/pdf">Invoice</a>'
+          : '<button class="btn btn--sm btn--primary" data-sell="' + u.id + '">Sell</button> ' +
+            '<a class="btn btn--sm btn--ghost" target="_blank" href="/api/used/' + u.id + '/receipt/pdf">Receipt</a>';
         return '<tr><td>' + ui.esc(u.receipt_no || u.id) + '</td><td>' + ui.esc(u.seller_name || '—') +
           '</td><td>' + ui.esc(u.model || '—') + '</td><td>' + ui.money(u.purchase_price) +
-          '<td class="cell-actions"><a class="btn btn--sm btn--ghost" target="_blank" href="/api/used/' + u.id + '/receipt/pdf">Receipt</a></td></tr>';
+          '</td><td>' + ui.money(u.sale_price) + '</td><td>' + badge +
+          '</td><td class="cell-actions">' + actions + '</td></tr>';
       }, 'No used-phone purchases yet.');
     } catch (e) {
       ui.showComingOnline(body.closest('.card'), 'Used-buying is coming online — backend route /api/used is not ready yet.');
     }
   }
+
+  // Sell button -> one-click resale (creates a sale + invoice).
+  body.addEventListener('click', async function (e) {
+    const sellId = e.target.getAttribute('data-sell');
+    if (!sellId) return;
+    if (!confirm('Sell this used phone? An invoice will be created.')) return;
+    try {
+      const res = await api.post('/api/used/' + sellId + '/sell', {});
+      ui.toast('Sold — invoice ' + res.invoiceNo, 'success');
+      load();
+    } catch (err) {
+      ui.showError(err);
+    }
+  });
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -90,6 +113,7 @@
       imei2: document.getElementById('u_imei2').value.trim(),
       conditionNote: document.getElementById('u_cond').value.trim(),
       purchasePrice: Number(document.getElementById('u_price').value || 0),
+      salePrice: Number(document.getElementById('u_saleprice').value || 0),
       buyerSign: signPad.isEmpty() ? null : signPad.toDataURL(),
       buyerThumb: thumbFileDataUrl || (thumbPad.isEmpty() ? null : thumbPad.toDataURL())
     };

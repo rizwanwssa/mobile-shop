@@ -70,9 +70,14 @@ router.post('/sales', authenticate, (req, res) => {
        VALUES (?,?,?,?,?,?)`
     );
     const markSold = db.prepare("UPDATE inventory_units SET status='sold', updated_at=? WHERE id=?");
+    const syncUsedSold = db.prepare("UPDATE used_purchases SET status='sold', sold_at=?, sold_sale_id=? WHERE inventory_unit_id=? AND status='in_stock'");
     for (const r of itemRows) {
       insItem.run(saleId, r.invUnitId, r.description, r.qty, r.unit, r.lineTotal);
-      if (r.invUnitId) markSold.run(Date.now(), r.invUnitId);
+      if (r.invUnitId) {
+        markSold.run(Date.now(), r.invUnitId);
+        // Keep the linked Used-Buying record in sync if this unit came from a used purchase.
+        syncUsedSold.run(Date.now(), saleId, r.invUnitId);
+      }
     }
     return { saleId, invoiceNo, grandTotal };
   });

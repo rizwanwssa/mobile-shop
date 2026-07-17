@@ -26,7 +26,8 @@
             <div class="field"><label>IMEI 1</label><input id="u_imei1"></div>
             <div class="field"><label>IMEI 2</label><input id="u_imei2"></div>
             <div class="field col-span-2"><label>Condition</label><textarea id="u_cond" rows="2"></textarea></div>
-            <div class="field"><label>Price (Rs)</label><input id="u_price" type="number" step="0.01" min="0" required></div>
+            <div class="field"><label>Buying Price (Rs)</label><input id="u_price" type="number" step="0.01" min="0" required></div>
+            <div class="field"><label>Resale Price (Rs)</label><input id="u_saleprice" type="number" step="0.01" min="0" placeholder="what you'll sell it for"></div>
           </div>
 
           <h4 class="mt">Seller Signature <button type="button" class="btn btn--sm btn--ghost" id="clearSign">Clear</button></h4>
@@ -52,8 +53,8 @@
         <h3 class="card__title">Recent Purchases</h3>
         <div class="table-wrap">
           <table class="data" id="usedTable">
-            <thead><tr><th>Receipt</th><th>Seller</th><th>Model</th><th>Price</th><th></th></tr></thead>
-            <tbody id="usedBody"><tr><td colspan="5">Loading…</td></tr></tbody>
+            <thead><tr><th>Receipt</th><th>Seller</th><th>Model</th><th>Buy</th><th>Resale</th><th>Status</th><th></th></tr></thead>
+            <tbody id="usedBody"><tr><td colspan="7">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
